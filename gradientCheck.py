@@ -13,13 +13,13 @@ def numerical_gradient(f, X, dout, h=1e-5):
 
         X[index] = curr_val - h
 
-        print(X)
+        # print(X)
 
         left = f(X).copy()
 
         X[index] = curr_val + h
 
-        print(X)
+        # print(X)
 
         right = f(X).copy()
 
