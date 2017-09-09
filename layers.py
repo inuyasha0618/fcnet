@@ -73,6 +73,57 @@ def affine_relu_backward(dout, cache):
 
 def softmax_loss(X, y):
 
-	
+	N, D = X.shape
+
+	max_score =  np.max(X, axis=1, keepdims=True)
+
+	max_mask = X == max_score
+
+	safe_X = X - max_score
+
+	exp_X = np.exp(safe_X)
+
+	exp_sum = np.sum(exp_X, axis=1, keepdims=True)
+
+	exp_proportion = exp_X / exp_sum
+
+	log_out = -np.log(exp_proportion)
+
+	y_index_mask = np.zeros_like(X)
+
+	y_index_mask[np.arange(N), y] = 1
+
+	index_out = log_out * y_index_mask
+
+	loss = np.sum(out) / N
+
+	# back prop
+	dsum = 1 / N
+
+	dindex_out = dsum * np.ones_like(X)
+
+	dlog_out = y_index_mask * dindex_out
+
+	dexp_proportion = -1 / exp_proportion * dlog_out
+
+	dexp1 = 1 / (exp_sum * np.ones_like(X)) * dexp_proportion
+
+	dexp_sum = np.sum(-exp_X * dexp_proportion / (exp_sum ** 2), axis=1)
+
+	dexp2 = dexp_sum * np.ones_like(X)
+
+	dexp_X = dexp1 + dexp2
+
+	dsafe_X = exp_X * dexp_X
+
+	dX1 = dsafe_X
+
+	dmax = -np.sum(dsafe_X, axis=1)
+
+	dX2 = dmax * max_mask
+
+	dX = dX1 + dX2
+
+	return loss, dX
 
 
