@@ -1,13 +1,18 @@
+# coding=utf-8
 import numpy as np
 from layers import *
 
+
 class FullyConnectNet(object):
 	"""docstring for ClassName"""
-	def __init__(self, layers, batch_size, input_dim, reg=0.5, mode='train'):
+	def __init__(self, layers=[], input_dim=10, reg=0.5, mode='train'):
 
 		# 此处接受layers(list or tuple)由用户自己定义多少层，每层多少个神经元
 
 		self.layers = layers
+		self.input_dim = input_dim
+		self.reg = reg
+		self.mode = mode
 
 		# 初始化各层参数
 
@@ -31,7 +36,7 @@ class FullyConnectNet(object):
 	def loss(self, mini_batch_x, mini_batch_y=None):
 
 		# 下面逐层计算前向传播及反向传播
-		layer_counts = self.layers.length
+		layer_counts = len(self.layers)
 
 		layer_out = None
 		layer_cache = None
@@ -39,7 +44,7 @@ class FullyConnectNet(object):
 
 		regulation = 0
 
-		for layer in np.arange(layer_counts)::
+		for layer in np.arange(layer_counts):
 
 			# 如果是第一层
 			if layer == 0:
@@ -47,7 +52,7 @@ class FullyConnectNet(object):
 				layer_out, layer_cache = affine_relu_forward(mini_batch_x, self.params['W1'], self.params['b1'])
 
 			# 如果是最后一层
-			elif layer == layer_counts - 1::
+			elif layer == layer_counts - 1:
 
 				layer_out, layer_cache = affine_forward(layer_out, self.params['W%d'%(layer + 1)], self.params['b%d'%(layer + 1)])
 			else:
