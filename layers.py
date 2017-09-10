@@ -95,10 +95,13 @@ def softmax_loss(X, y):
 
 	index_out = log_out * y_index_mask
 
-	loss = np.sum(out) / N
+	loss = np.sum(index_out) / N
+
+	if y is None:
+		return loss
 
 	# back prop
-	dsum = 1 / N
+	dsum = 1.0 / N
 
 	dindex_out = dsum * np.ones_like(X)
 
@@ -108,7 +111,7 @@ def softmax_loss(X, y):
 
 	dexp1 = 1 / (exp_sum * np.ones_like(X)) * dexp_proportion
 
-	dexp_sum = np.sum(-exp_X * dexp_proportion / (exp_sum ** 2), axis=1)
+	dexp_sum = np.sum(-exp_X * dexp_proportion / (exp_sum ** 2), axis=1, keepdims=True)
 
 	dexp2 = dexp_sum * np.ones_like(X)
 
@@ -118,7 +121,7 @@ def softmax_loss(X, y):
 
 	dX1 = dsafe_X
 
-	dmax = -np.sum(dsafe_X, axis=1)
+	dmax = -np.sum(dsafe_X, axis=1, keepdims=True)
 
 	dX2 = dmax * max_mask
 
@@ -127,3 +130,27 @@ def softmax_loss(X, y):
 	return loss, dX
 
 
+def softmax_loss_true(x, y):
+    """
+    Computes the loss and gradient for softmax classification.
+
+    Inputs:
+    - x: Input data, of shape (N, C) where x[i, j] is the score for the jth
+      class for the ith input.
+    - y: Vector of labels, of shape (N,) where y[i] is the label for x[i] and
+      0 <= y[i] < C
+
+    Returns a tuple of:
+    - loss: Scalar giving the loss
+    - dx: Gradient of the loss with respect to x
+    """
+    shifted_logits = x - np.max(x, axis=1, keepdims=True)
+    Z = np.sum(np.exp(shifted_logits), axis=1, keepdims=True)
+    log_probs = shifted_logits - np.log(Z)
+    probs = np.exp(log_probs)
+    N = x.shape[0]
+    loss = -np.sum(log_probs[np.arange(N), y]) / N
+    dx = probs.copy()
+    dx[np.arange(N), y] -= 1
+    dx /= N
+    return loss, dx
