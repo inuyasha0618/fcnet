@@ -62,8 +62,8 @@ class FullyConnectNet(object):
 			cache.append(layer_cache)
 
 		# 如果是test mode，
-		if self.mode == 'test':
-
+		# if self.mode == 'test':
+		if mini_batch_y is None:
 			return layer_out
 
 		# 计算loss并且开始反向传播
@@ -97,4 +97,27 @@ class FullyConnectNet(object):
 			grads['b%d'%(layer + 1)] = db + self.reg * self.params['b%d'%(layer + 1)]
 
 		return loss, grads
+
+	def predict(self, X):
+
+		layer_counts = len(self.layers)
+
+		layer_out = None
+
+		for layer in np.arange(layer_counts):
+
+			# 如果是第一层
+			if layer == 0:
+
+				layer_out, _ = affine_relu_forward(X, self.params['W1'], self.params['b1'])
+
+			# 如果是最后一层
+			elif layer == layer_counts - 1:
+
+				layer_out, _ = affine_forward(layer_out, self.params['W%d'%(layer + 1)], self.params['b%d'%(layer + 1)])
+			else:
+
+				layer_out, _ = affine_relu_forward(layer_out, self.params['W%d'%(layer + 1)], self.params['b%d'%(layer + 1)])
+
+		return np.argmax(layer_out, axis=1)
 		

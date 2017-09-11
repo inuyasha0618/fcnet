@@ -48,3 +48,12 @@ class Trainer(object):
 			loss_cache.append(loss)
 
 		return loss_cache
+
+	def check_train_accuracy(self):
+
+		predict = self.model.predict(self.X_train)
+
+		accuracy = np.mean(predict == self.y_train)
+
+		return accuracy
+		
