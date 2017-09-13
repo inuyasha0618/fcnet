@@ -5,7 +5,7 @@ from layers import *
 
 class FullyConnectNet(object):
 	"""docstring for ClassName"""
-	def __init__(self, layers=[], input_dim=10, reg=0.5, mode='train'):
+	def __init__(self, layers=[], input_dim=10, reg=0.5, mode='train', weight_scale=1):
 
 		# 此处接受layers(list or tuple)由用户自己定义多少层，每层多少个神经元
 
@@ -13,22 +13,25 @@ class FullyConnectNet(object):
 		self.input_dim = input_dim
 		self.reg = reg
 		self.mode = mode
+		self.weight_scale = weight_scale
 
 		# 初始化各层参数
 
 		self.params = {}
 
+		print(self.weight_scale)
+
 		for idx, neurons in enumerate(layers):
 
 			if idx == 0:
 
-				self.params['W1'] = np.random.randn(input_dim, neurons)
+				self.params['W1'] = self.weight_scale * np.random.randn(input_dim, neurons)
 
 			else:
 
-				self.params['W%d'%(idx + 1)] = np.random.randn(layers[idx - 1], neurons)
+				self.params['W%d'%(idx + 1)] = self.weight_scale * np.random.randn(layers[idx - 1], neurons)
 
-			self.params['b%d'%(idx + 1)] = np.random.rand(neurons)
+			self.params['b%d'%(idx + 1)] = np.zeros(neurons)
 
 
 	# 这里最后一层用softmax计算loss, 在参数为self.params时， current mini-batch计算出的损失和梯度
@@ -65,6 +68,8 @@ class FullyConnectNet(object):
 		# if self.mode == 'test':
 		if mini_batch_y is None:
 			return layer_out
+
+		# print(layer_out)
 
 		# 计算loss并且开始反向传播
 

@@ -47,6 +47,9 @@ class Trainer(object):
 
 			loss_cache.append(loss)
 
+			if (i + 1) % iters_per_epoch == 0:
+				print('epoch%d: train acc: %.2f val acc %.2f'%((i + 1) // iters_per_epoch, self.check_train_accuracy(), self.check_val_accuracy()))
+
 		return loss_cache
 
 	def check_train_accuracy(self):
@@ -54,6 +57,14 @@ class Trainer(object):
 		predict = self.model.predict(self.X_train)
 
 		accuracy = np.mean(predict == self.y_train)
+
+		return accuracy
+
+	def check_val_accuracy(self):
+
+		predict = self.model.predict(self.X_val)
+
+		accuracy = np.mean(predict == self.y_val)
 
 		return accuracy
 		
